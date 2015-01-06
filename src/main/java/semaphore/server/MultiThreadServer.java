@@ -21,12 +21,16 @@ public class MultiThreadServer {
         try {
             socket = new ServerSocket(portNumber);
             System.out.println("Server started and listening port: " + portNumber);
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 new Thread(new ServerRequestHandler(socket.accept(), semaphore)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void stopServer () {
+        Thread.currentThread().interrupt();
     }
 
     public static void main(String[] args) {

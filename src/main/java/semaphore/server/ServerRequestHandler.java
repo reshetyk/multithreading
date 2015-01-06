@@ -20,8 +20,10 @@ class ServerRequestHandler implements Runnable {
         try {
             semaphore.acquire();
             PrintStream printStream = new PrintStream(socket.getOutputStream());
-            printStream.println("request accepted by " + Thread.currentThread().getName());
-            Thread.sleep(6000);
+            final String message = "request accepted by " + Thread.currentThread().getName();
+            printStream.println("Client:" + message);
+            System.out.println("Server:" + message);
+            Thread.sleep(1000);
             printStream.close();
             socket.close();
         } catch (Exception e) {
