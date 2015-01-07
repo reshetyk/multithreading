@@ -1,4 +1,4 @@
-package cyclicbarrier.downloadmanager;
+package phaser.downloadmanager;
 
 import java.net.URL;
 import java.util.Random;

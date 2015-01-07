@@ -7,7 +7,7 @@ import java.util.concurrent.Semaphore;
 /**
  * @author alre
  */
-class ServerRequestHandler implements Runnable {
+public class ServerRequestHandler implements Runnable {
     private final Socket socket;
     private final Semaphore semaphore;
 
@@ -32,5 +32,4 @@ class ServerRequestHandler implements Runnable {
             semaphore.release();
         }
     }
-
 }

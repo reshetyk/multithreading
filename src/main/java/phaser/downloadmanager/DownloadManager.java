@@ -1,6 +1,5 @@
-package cyclicbarrier.downloadmanager;
+package phaser.downloadmanager;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +48,5 @@ public class DownloadManager {
         parts.add(new PartDownloader.Part(url, 9, 10));
 
         return parts;
-    }
-
-    public static void main(String[] args) throws MalformedURLException {
-        final DownloadManager downloadManager = new DownloadManager(new Phaser(), new URL("http://filesserver.com/big_movie.avi"));
-        downloadManager.downloadFile();
     }
 }
