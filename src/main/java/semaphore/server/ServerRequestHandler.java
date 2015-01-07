@@ -23,7 +23,7 @@ class ServerRequestHandler implements Runnable {
             final String message = "request accepted by " + Thread.currentThread().getName();
             printStream.println("Client:" + message);
             System.out.println("Server:" + message);
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             printStream.close();
             socket.close();
         } catch (Exception e) {

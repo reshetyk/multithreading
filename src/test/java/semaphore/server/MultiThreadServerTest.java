@@ -15,32 +15,37 @@ public class MultiThreadServerTest {
         final int maxConnections = 3;
 
         final MultiThreadServer server = new MultiThreadServer(portNumber, maxConnections);
-        new Thread() {
-            @Override
-            public void run() {
-                server.startServer();
-            }
-        }.start();
 
+        final Thread serverThread = new Thread(() -> server.startServer());
+        serverThread.start();
 
         for (int i = 0; i < 10; i++) {
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Socket client = new Socket("localhost", portNumber);
-                        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                        System.out.println(in.readLine());
-                        in.close();
-                        client.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }.start();
+            new Thread(() -> {
+                final String answer = createClientAndReceiveAnswer(portNumber, "localhost");
+                System.out.println(answer);
+            }, "thread-" + i).start();
         }
-        Thread.currentThread().join();
-        server.stopServer();
+        serverThread.join(10000);
+    }
+
+    private String createClientAndReceiveAnswer(int portNumber, String host) {
+        BufferedReader in = null;
+        Socket client = null;
+        try {
+            client = new Socket(host, portNumber);
+            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            return in.readLine();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                client.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
     }
 }
