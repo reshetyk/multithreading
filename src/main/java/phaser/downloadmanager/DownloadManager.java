@@ -19,18 +19,13 @@ public class DownloadManager {
 
     public void downloadFile() {
         List<PartDownloader.Part> parts = divideFileIntoParts(url);
-
-        phaser.bulkRegister(parts.size());
-
-        //start all threads
+        phaser.bulkRegister(parts.size()); //register participants
+        //start downloading each part in separated thread
         for(PartDownloader.Part part : parts) {
             new Thread(new PartDownloader(part, phaser)).start();
         }
-
-        phaser.awaitAdvance(phaser.getPhase());
-
-        mergeDownloadedParts();
-
+        phaser.awaitAdvance(phaser.getPhase()); //wait here other participants
+        mergeDownloadedParts(); //merge after all
     }
 
     private void mergeDownloadedParts() {
@@ -40,13 +35,11 @@ public class DownloadManager {
 
     private List<PartDownloader.Part> divideFileIntoParts(URL url) {
         List<PartDownloader.Part> parts = new ArrayList<PartDownloader.Part>();
-
         parts.add(new PartDownloader.Part(url, 1, 2));
         parts.add(new PartDownloader.Part(url, 3, 4));
         parts.add(new PartDownloader.Part(url, 5, 6));
         parts.add(new PartDownloader.Part(url, 7, 8));
         parts.add(new PartDownloader.Part(url, 9, 10));
-
         return parts;
     }
 }

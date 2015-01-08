@@ -27,7 +27,6 @@ class Service implements Runnable {
         }
         System.out.println(name + " is Up");
         latch.countDown(); //reduce count of CountDownLatch by 1
-        System.out.println("after count down " + Thread.currentThread().getName());
     }
 
     public static void main(String args[]) {

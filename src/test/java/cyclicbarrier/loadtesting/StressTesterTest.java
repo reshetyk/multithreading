@@ -22,6 +22,13 @@ public class StressTesterTest {
             new Thread(new StressTester(barrier)).start();
         }
         Thread.currentThread().join(11000);
+
+        //no need to reset barrier, we can use it again
+
+        for (int i = 0; i < parties; i++) {
+            new Thread(new StressTester(barrier)).start();
+        }
+        Thread.currentThread().join(11000);
         System.out.println("Main ends");
     }
 }
