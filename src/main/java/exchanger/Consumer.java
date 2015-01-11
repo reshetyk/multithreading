@@ -21,11 +21,11 @@ public class Consumer implements Runnable {
         DataBuffer currentBuffer = dataBuffer;
         try {
             while (true) {
-                takeFromBuffer(currentBuffer);
                 Thread.sleep(random.nextInt(4000));
+                takeFromBuffer(currentBuffer);
                 if (currentBuffer.isEmpty()) {
                     System.out.println("Consumer: current " + currentBuffer + " is empty and wants to be exchanged");
-                    currentBuffer = exchanger.exchange(currentBuffer);
+                    currentBuffer = exchanger.exchange(currentBuffer); //<-- will wait Producer here
                     System.out.println("Consumer: dataBuffer is exchanged, now the buffer is " + currentBuffer );
                 }
             }

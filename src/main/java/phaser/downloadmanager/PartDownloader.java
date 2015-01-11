@@ -17,11 +17,10 @@ public class PartDownloader implements Runnable {
         this.phaser = phaser;
     }
 
-    protected void downloadPart() throws InterruptedException, BrokenBarrierException {
+    protected void downloadPart() throws InterruptedException {
         System.out.println("downloading " + part);
-        Thread.currentThread().sleep(new Random().nextInt(6000));
+        Thread.sleep(new Random().nextInt(6000));
         System.out.println(part + " is downloaded");
-
         phaser.arriveAndDeregister();
     }
 
@@ -30,15 +29,10 @@ public class PartDownloader implements Runnable {
     public void run() {
         try {
             downloadPart();
-        } catch (InterruptedException | BrokenBarrierException e) {
-            makePartSnapshot();
+        } catch (InterruptedException e) {
             System.out.println("downloading was interrupted");
         }
 
-    }
-
-    private void makePartSnapshot() {
-        System.out.println("snapshot for " + this + " done");
     }
 
     public static class Part {

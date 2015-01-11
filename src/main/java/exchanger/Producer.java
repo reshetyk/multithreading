@@ -9,7 +9,7 @@ import java.util.concurrent.Exchanger;
 public class Producer implements Runnable {
     private final DataBuffer dataBuffer;
     private final Exchanger<DataBuffer> exchanger;
-    private final static Random random = new Random(2000);
+    private final static Random random = new Random();
     private int count = 0;
 
     public Producer(DataBuffer dataBuffer, Exchanger<DataBuffer> exchanger) {
@@ -22,11 +22,11 @@ public class Producer implements Runnable {
         DataBuffer currentBuffer = dataBuffer;
         try {
             while (true) {
-                addToBuffer();
                 Thread.sleep(random.nextInt(500));
+                addToBuffer(currentBuffer);
                 if (currentBuffer.isFull()) {
                     System.out.println("Producer: current " + currentBuffer + " is full and wants to be exchanged");
-                    currentBuffer = exchanger.exchange(currentBuffer);
+                    currentBuffer = exchanger.exchange(currentBuffer); // <-- will wait Consumer here
                     System.out.println("Producer: dataBuffer is exchanged, now the buffer is " + currentBuffer );
                 }
             }
@@ -35,7 +35,7 @@ public class Producer implements Runnable {
         }
     }
 
-    private void addToBuffer() {
-        dataBuffer.add("NewItem " + ++count);
+    private void addToBuffer(DataBuffer currentBuffer) {
+        currentBuffer.add("NewItem " + ++count);
     }
 }

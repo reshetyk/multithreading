@@ -3,18 +3,24 @@ package exchanger;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author Alexey
  */
 public class DataBuffer {
     private final static int MAX = 5;
-    private Queue<String> queue = new LinkedList<>();
+    private Queue<String> queue = new ConcurrentLinkedQueue<>();
+    private String name;
+
+    public DataBuffer(String name) {
+        this.name = name;
+    }
 
     public void add(String s) {
         if (!isFull()) {
             queue.add(s);
-            System.out.println("added element " + s);
+            System.out.println(name + ": added element " + s);
         }
     }
 
@@ -29,7 +35,7 @@ public class DataBuffer {
     public String remove() {
         if (!isEmpty()) {
             final String removed = queue.remove();
-            System.out.println("removed element " + removed);
+            System.out.println(name + ":removed element " + removed);
             return removed;
         }
         return null;
@@ -37,7 +43,7 @@ public class DataBuffer {
 
     @Override
     public String toString() {
-        return "DataBuffer{" +
+        return "DataBuffer - " + name + " {" +
                 "queue=" + Arrays.toString(queue.toArray()) +
                 '}';
     }
