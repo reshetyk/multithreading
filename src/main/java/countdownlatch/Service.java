@@ -31,9 +31,9 @@ class Service implements Runnable {
 
     public static void main(String args[]) {
         final CountDownLatch latch = new CountDownLatch(3);
-        Thread cacheService = new Thread(new Service("CacheService", 1000, latch));
+        Thread cacheService = new Thread(new Service("CacheService", 3000, latch));
         Thread alertService = new Thread(new Service("AlertService", 1000, latch));
-        Thread validationService = new Thread(new Service("ValidationService", 1000, latch));
+        Thread validationService = new Thread(new Service("ValidationService", 4000, latch));
         cacheService.start(); //separate thread will initialize CacheService
         alertService.start(); //another thread for AlertService initialization
         validationService.start();
