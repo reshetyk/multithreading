@@ -88,7 +88,7 @@ class BillValidatorHasMoney implements Runnable {
     public void run() {
         System.out.println("check has money...");
         try {
-            Thread.currentThread().sleep(2000);
+            Thread.currentThread().sleep(3000);
             System.out.println("has money ok!");
         } catch (InterruptedException e) {
             e.printStackTrace();
