@@ -1,22 +1,17 @@
 package condition;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class HashLocker {
     public final static int ACCOUNT_COUNT = 10;
-    public final static int HASH_COUNT = 4;
-    public final static int THREAD_COUNT = 2;
+    public final static int HASH_COUNT = 8;
+    public final static int THREAD_COUNT = 5;
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        ReentrantLock lock = new ReentrantLock(true);
-        Condition lockCondition = lock.newCondition();
-        Set<Integer> inProcess = new CopyOnWriteArraySet<>();
+        Map<Integer, Thread> inProcess = new ConcurrentHashMap<>();
         ExecutorService poolExecutor = Executors.newFixedThreadPool(THREAD_COUNT);
         List<Mapper> mappers = new ArrayList<>();
 
@@ -27,7 +22,7 @@ public class HashLocker {
         poolExecutor.invokeAll(mappers).forEach((Future<Account> future) -> {
             try {
                 Account account = future.get();
-                poolExecutor.submit(new Saver(account, inProcess, lock, lockCondition));
+                poolExecutor.submit(new Saver(account, inProcess));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -59,42 +54,36 @@ class Account {
 
 class Saver implements Runnable {
 
-    private final ReentrantLock lock;
-    Condition lockCondition;
     Account account;
-    Set<Integer> inProcess;
+    Map<Integer, Thread> inProcess;
 
 
-    public Saver(Account account, Set<Integer> inProcess, ReentrantLock lock, Condition lockCondition) {
+    public Saver(Account account, Map<Integer, Thread> inProcess) {
         this.account = account;
         this.inProcess = inProcess;
-        this.lock = lock;
-        this.lockCondition = lockCondition;
     }
 
     @Override
     public void run() {
-        String currentThreadName = Thread.currentThread().getName();
+        Thread currentThread = Thread.currentThread();
+        String currentThreadName = currentThread.getName();
         try {
-            while (inProcess.contains(account.hash)) {
+            while (inProcess.containsKey(account.hash)) {
+                Thread threadInProgress = inProcess.get(account.hash);
                 System.out.println(currentThreadName + ": waiting until account with hash [" + account.hash + "] will be stored");
-                lock.lock();
-                lockCondition.await();
+                threadInProgress.join();
+                System.out.println(currentThreadName + ": [" + account.hash + "] stored");
             }
-
-            inProcess.add(account.hash);
-            System.out.println(currentThreadName + ": hash -> " + account.hash + " currently in process " + Arrays.toString(inProcess.toArray()));
+            inProcess.put(account.hash, currentThread);
+            System.out.println(currentThreadName + ": [" + account.hash + "] currently in process " + inProcess.toString());
             Thread.currentThread().sleep(100 + (int) (Math.random() * 200));
             System.out.println(currentThreadName + ": saving account data " + account.toString());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (inProcess.contains(account.hash)) {
+            if (inProcess.containsKey(account.hash)) {
                 inProcess.remove(account.hash);
-                System.out.println(currentThreadName + ": hash -> " + account.hash + " currently in process " + Arrays.toString(inProcess.toArray()) + " after removal");
-                lockCondition.signal();
             }
-            lock.unlock();
         }
     }
 }
