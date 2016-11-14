@@ -75,6 +75,7 @@ class Saver implements Runnable {
 
     @Override
     public void run() {
+        lock.lock();
         try {
             String currentThreadName = Thread.currentThread().getName();
 
@@ -97,9 +98,9 @@ class Saver implements Runnable {
         } finally {
             if (inProcess.contains(account.hash)) {
                 inProcess.remove(account.hash);
+                lockCondition.signal();
             }
             lock.unlock();
-            lockCondition.signal();
         }
     }
 }
