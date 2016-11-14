@@ -76,28 +76,23 @@ class Saver implements Runnable {
     @Override
     public void run() {
         lock.lock();
+        String currentThreadName = Thread.currentThread().getName();
         try {
-            String currentThreadName = Thread.currentThread().getName();
-
             while (inProcess.contains(account.hash)) {
-                System.out.println(currentThreadName + ": currently in process " + Arrays.toString(inProcess.toArray()));
-//                System.out.println(currentThreadName + " waiting until account with hash ["+account.hash+"] will be stored");
-//                System.out.println(currentThreadName + " getHoldCount:" + lock.getHoldCount());
-//                System.out.println(currentThreadName + " isHeldByCurrentThread:" + lock.isHeldByCurrentThread());
-//                System.out.println(currentThreadName + " isLocked:" + lock.isLocked());
-//                System.out.println(currentThreadName + " getWaitQueueLength:" + lock.getWaitQueueLength(lockCondition));
+                System.out.println(currentThreadName + " waiting until account with hash ["+account.hash+"] will be stored");
                 lockCondition.await();
             }
 
             inProcess.add(account.hash);
+            System.out.println(currentThreadName + ": currently in process " + Arrays.toString(inProcess.toArray()));
             Thread.currentThread().sleep(100 + (int) (Math.random() * 200));
             System.out.println(currentThreadName + ": saving account data " + account.toString());
-            System.out.println(currentThreadName + ": currently in process " + Arrays.toString(inProcess.toArray()) + "after removal");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (inProcess.contains(account.hash)) {
                 inProcess.remove(account.hash);
+                System.out.println(currentThreadName + ": currently in process " + Arrays.toString(inProcess.toArray()) + " after removal");
                 lockCondition.signal();
             }
             lock.unlock();
